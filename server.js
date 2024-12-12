@@ -6,5 +6,5 @@ const PORT = 3030;
 
 // Ouve as conexões
 app.listen(PORT, () => {
-  console.log("Servidor escutando...");
+  console.log("Server listening...");
 });

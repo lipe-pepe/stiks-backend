@@ -1,8 +1,21 @@
+import { Room } from "../models/index.js";
+
 class RoomsController {
-  static createRoom() {
-    return generateRoomCode();
+  static async createRoom(req, res, next) {
+    try {
+      const roomCode = generateRoomCode();
+      const roomJson = {
+        code: roomCode,
+      };
+      const createdRoom = await Room.create(roomJson);
+      res.status(201).json({ message: "Room created", room: createdRoom });
+    } catch (error) {
+      next(error);
+    }
   }
 }
+
+// ================================================================================================
 
 function generateRoomCode(length = 6) {
   const chars = "abcdefghijklmnopqrstuvwxyz0123456789";
