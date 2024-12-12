@@ -1,7 +1,15 @@
+import "dotenv/config"; // Inicia o dotenv na aplicação, isso deve ser feito no arquivo mais externo
+
+import http from "http";
+
 import express from "express";
 import cors from "cors";
 import dbConnect from "./config/dbConnect.js";
 import routes from "./routes/index.js";
+import { Server } from "socket.io";
+
+// Porta que será usada na aplicação
+const PORT = 3030;
 
 // Cria a conexão com o banco de dados
 const connection = await dbConnect();
@@ -23,6 +31,13 @@ connection.once("open", () => {
 // ==========================================================================================
 
 const app = express();
+const server = http.createServer(app);
+const io = new Server(server, {
+  cors: {
+    origin: process.env.FRONTEND_HOST,
+  },
+}); // Cria um servidor com métodos do Socket.Io incluídos
+
 routes(app); // inicia as rotas
 
 // TODO: Organizar middlewares
@@ -33,4 +48,22 @@ app.use(
   })
 );
 
-export default app;
+io.on("connection", (socket) => {
+  console.log("A user connected");
+
+  socket.on("join-lobby", ({ roomId, playerName }) => {
+    // Adiciona o socket à sala
+    socket.join(roomId);
+
+    // Emitir para todos os clientes da sala
+    io.to(roomId).emit("player-joined", {
+      message: `${playerName} entrou na sala!`,
+      playerName: playerName,
+    });
+  });
+});
+
+// Ouve as conexões
+server.listen(PORT, () => {
+  console.log(`Server listening at port ${PORT}...`);
+});
