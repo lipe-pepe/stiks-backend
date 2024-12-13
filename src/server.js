@@ -8,6 +8,9 @@ import dbConnect from "./config/dbConnect.js";
 import routes from "./routes/index.js";
 import { Server } from "socket.io";
 
+// Mapa para armazenar os jogadores de cada sala - TEMPORARIO
+const rooms = {};
+
 // Porta que será usada na aplicação
 const PORT = 3030;
 
@@ -44,7 +47,7 @@ routes(app); // inicia as rotas
 // Configura uma origem específica para o cors
 app.use(
   cors({
-    origin: "http://localhost:3000", // Origem do frontend
+    origin: process.env.FRONTEND_HOST, // Origem do frontend
   })
 );
 
@@ -52,14 +55,44 @@ io.on("connection", (socket) => {
   console.log("A user connected");
 
   socket.on("join-lobby", ({ roomId, playerName }) => {
+    // Adiciona o jogador à sala no servidor - temporario
+    if (!rooms[roomId]) {
+      rooms[roomId] = [];
+    }
+    if (!rooms[roomId].includes(playerName)) rooms[roomId].push(playerName);
+
+    console.log(`${playerName} entrou na sala ${roomId}`);
+
     // Adiciona o socket à sala
     socket.join(roomId);
+
+    // Envia para o novo jogador a lista de jogadores da sala
+    socket.emit("player-list", rooms[roomId]);
 
     // Emitir para todos os clientes da sala
     io.to(roomId).emit("player-joined", {
       message: `${playerName} entrou na sala!`,
-      playerName: playerName,
+      players: rooms[roomId],
     });
+  });
+
+  socket.on("leave-lobby", ({ roomId, playerName }) => {
+    console.log(`${playerName} deixou a sala ${roomId}`);
+
+    if (rooms[roomId]?.includes(playerName)) {
+      const i = rooms[roomId].indexOf(playerName);
+      rooms[roomId].splice(i, 1);
+    }
+
+    // Emitir para todos os clientes da sala
+    io.to(roomId).emit("player-left", {
+      message: `${playerName} deixou a sala.`,
+      players: rooms[roomId],
+    });
+  });
+
+  socket.on("chat-message-sent", ({ roomId, message }) => {
+    io.to(roomId).emit("chat-message-received", message);
   });
 });
 
