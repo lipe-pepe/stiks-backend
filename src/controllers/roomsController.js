@@ -1,9 +1,21 @@
 import { Room } from "../models/index.js";
 
 class RoomsController {
+  static async getRoom(req, res, next) {
+    try {
+      const code = req.params.code;
+      const roomResult = await Room.findOne({ code: code });
+      if (roomResult !== null) {
+        res.status(200).json({ message: "Room found", room: roomResult });
+      } else {
+        res.status(404).json({ message: "Room not found" });
+      }
+    } catch (error) {
+      next(error);
+    }
+  }
   static async createRoom(req, res, next) {
     try {
-      console.log(req.body);
       // const playerName =req.body
       const roomCode = generateRoomCode();
       const roomJson = {
