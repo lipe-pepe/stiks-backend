@@ -54,6 +54,13 @@ function lobbyEvents(socket, io) {
   socket.on("chat-message-sent", ({ roomCode, message }) => {
     io.to(roomCode).emit("chat-message-received", message);
   });
+
+  // -------------------------------------------------------------------------------
+
+  socket.on("start-game", ({ roomCode }) => {
+    // Emitir para todos os clientes da sala
+    io.to(roomCode).emit("host-started-game");
+  });
 }
 
 export default lobbyEvents;

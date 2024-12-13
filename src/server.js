@@ -8,6 +8,7 @@ import dbConnect from "./config/dbConnect.js";
 import routes from "./routes/index.js";
 import { Server } from "socket.io";
 import lobbyEvents from "./events/lobbyEvents.js";
+import gameEvents from "./events/gameEvents.js";
 
 // Porta que será usada na aplicação
 const PORT = 3030;
@@ -51,6 +52,7 @@ app.use(
 
 io.on("connection", (socket) => {
   lobbyEvents(socket, io);
+  gameEvents(socket, io);
 });
 
 // Ouve as conexões
