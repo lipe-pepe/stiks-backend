@@ -2,13 +2,14 @@
 import express from "express";
 
 import roomsRoutes from "./roomsRoutes.js";
+import gamesRoutes from "./gamesRoutes.js";
 
 // Essa função centraliza as rotas
 const routes = (app) => {
   //   app.route("/").get((req, res) => res.status(200).send(""));
 
   // .use inclui middlewares na instância do express
-  app.use(express.json(), roomsRoutes);
+  app.use(express.json(), roomsRoutes, gamesRoutes);
 };
 
 export default routes;
