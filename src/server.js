@@ -7,9 +7,7 @@ import cors from "cors";
 import dbConnect from "./config/dbConnect.js";
 import routes from "./routes/index.js";
 import { Server } from "socket.io";
-
-// Mapa para armazenar os jogadores de cada sala - TEMPORARIO
-const rooms = {};
+import RoomsController from "./controllers/roomsController.js";
 
 // Porta que será usada na aplicação
 const PORT = 3030;
@@ -54,45 +52,42 @@ app.use(
 io.on("connection", (socket) => {
   console.log("A user connected");
 
-  socket.on("join-lobby", ({ roomId, playerName }) => {
-    // Adiciona o jogador à sala no servidor - temporario
-    if (!rooms[roomId]) {
-      rooms[roomId] = [];
+  socket.on("join-lobby", async ({ roomCode, playerName }) => {
+    // Adiciona o jogador à sala no servidor
+    const result = await RoomsController.addPlayerToRoom(roomCode, playerName);
+
+    if (result.success) {
+      console.log(`${playerName} entrou na sala ${roomCode}`);
+      // Adiciona o socket à sala
+      socket.join(roomCode);
+      console.log("TEM QUE MANDAR");
+      // Emitir para todos os clientes da sala
+      io.to(roomCode).emit("player-joined", {
+        message: `${playerName} entrou na sala!`,
+        players: result.room.players,
+      });
     }
-    if (!rooms[roomId].includes(playerName)) rooms[roomId].push(playerName);
-
-    console.log(`${playerName} entrou na sala ${roomId}`);
-
-    // Adiciona o socket à sala
-    socket.join(roomId);
-
-    // Envia para o novo jogador a lista de jogadores da sala
-    socket.emit("player-list", rooms[roomId]);
-
-    // Emitir para todos os clientes da sala
-    io.to(roomId).emit("player-joined", {
-      message: `${playerName} entrou na sala!`,
-      players: rooms[roomId],
-    });
   });
 
-  socket.on("leave-lobby", ({ roomId, playerName }) => {
-    console.log(`${playerName} deixou a sala ${roomId}`);
+  socket.on("leave-lobby", async ({ roomCode, playerName }) => {
+    // Remove o jogador da sala no servidor
+    const result = await RoomsController.removePlayerFromRoom(
+      roomCode,
+      playerName
+    );
 
-    if (rooms[roomId]?.includes(playerName)) {
-      const i = rooms[roomId].indexOf(playerName);
-      rooms[roomId].splice(i, 1);
+    if (result.success) {
+      console.log(`${playerName} deixou a sala ${roomCode}`);
+      // Emitir para todos os clientes da sala
+      io.to(roomCode).emit("player-left", {
+        message: `${playerName} deixou a sala.`,
+        players: result.room.players,
+      });
     }
-
-    // Emitir para todos os clientes da sala
-    io.to(roomId).emit("player-left", {
-      message: `${playerName} deixou a sala.`,
-      players: rooms[roomId],
-    });
   });
 
-  socket.on("chat-message-sent", ({ roomId, message }) => {
-    io.to(roomId).emit("chat-message-received", message);
+  socket.on("chat-message-sent", ({ roomCode, message }) => {
+    io.to(roomCode).emit("chat-message-received", message);
   });
 });
 

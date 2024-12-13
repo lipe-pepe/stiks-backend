@@ -16,11 +16,12 @@ class RoomsController {
   }
   static async createRoom(req, res, next) {
     try {
-      // const playerName =req.body
       const roomCode = generateRoomCode();
+
+      const hostName = req.body.hostName;
       const roomJson = {
         code: roomCode,
-        host: req.body.hostName,
+        host: hostName,
       };
       const createdRoom = await Room.create(roomJson);
       res.status(201).json({ message: "Room created", room: createdRoom });
@@ -40,6 +41,66 @@ class RoomsController {
       }
     } catch (error) {
       next(error);
+    }
+  }
+
+  // -------------------------------------------------------------------------
+
+  static async addPlayerToRoom(roomCode, playerName) {
+    try {
+      // Verifica se a sala existe
+      const room = await Room.findOne({ code: roomCode });
+      if (!room) {
+        return { success: false, message: "Room not found" };
+      }
+
+      // Verifica se o jogador já está na sala
+      const playerExists = room.players.some(
+        (player) => player.name === playerName
+      );
+      if (playerExists) {
+        return { success: false, message: "Player already in the room" };
+      }
+
+      // Adiciona o jogador à sala
+      room.players.push({ name: playerName });
+      console.log(room);
+      await room.save();
+      return { success: true, message: "Player added to room", room };
+    } catch (error) {
+      throw new Error(
+        "An error occurred while adding the player: " + error.message
+      );
+    }
+  }
+
+  static async removePlayerFromRoom(roomCode, playerName) {
+    try {
+      // Verifica se a sala existe
+      const room = await Room.findOne({ code: roomCode });
+      if (!room) {
+        return { success: false, message: "Room not found" };
+      }
+
+      // Verifica se o jogador já está na sala
+      const playerExists = room.players.some(
+        (player) => player.name === playerName
+      );
+      if (!playerExists) {
+        return { success: false, message: "Player isn't in the room" };
+      }
+
+      // Remove o jogador da sala
+      const newPlayersArray = room.players.filter(
+        (player) => player.name !== playerName
+      );
+      room.players = newPlayersArray;
+      await room.save();
+      return { success: true, message: "Player removed from room", room };
+    } catch (error) {
+      throw new Error(
+        "An error occurred while removing the player: " + error.message
+      );
     }
   }
 }
