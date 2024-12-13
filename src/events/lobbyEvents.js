@@ -1,4 +1,8 @@
-import RoomsController from "../controllers/roomsController.js";
+import {
+  addPlayerToRoom,
+  deleteRoom,
+  removePlayerFromRoom,
+} from "../db/rooms.js";
 
 // Esse arquivo registra todos os eventos relacionados ao lobby. Ele é depois usado no server para
 // registrar os eventos. Fazemos isso por questão de organização do código.
@@ -8,7 +12,7 @@ function lobbyEvents(socket, io) {
 
   socket.on("join-lobby", async ({ roomCode, playerName }) => {
     // Adiciona o jogador à sala no servidor
-    const result = await RoomsController.addPlayerToRoom(roomCode, playerName);
+    const result = await addPlayerToRoom(roomCode, playerName);
 
     if (result.success) {
       console.log(`${playerName} entrou na sala ${roomCode}`);
@@ -26,10 +30,7 @@ function lobbyEvents(socket, io) {
 
   socket.on("leave-lobby", async ({ roomCode, playerName }) => {
     // Remove o jogador da sala no servidor
-    const result = await RoomsController.removePlayerFromRoom(
-      roomCode,
-      playerName
-    );
+    const result = await removePlayerFromRoom(roomCode, playerName);
 
     if (result.success) {
       console.log(`${playerName} deixou a sala ${roomCode}`);
@@ -41,7 +42,7 @@ function lobbyEvents(socket, io) {
           players: result.room.players,
         });
       } else {
-        const result = await RoomsController.deleteRoom(roomCode);
+        const result = await deleteRoom(roomCode);
         if (!result.success) {
           console.error(result.message);
         }
