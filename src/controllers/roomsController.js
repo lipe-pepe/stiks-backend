@@ -64,7 +64,6 @@ class RoomsController {
 
       // Adiciona o jogador à sala
       room.players.push({ name: playerName });
-      console.log(room);
       await room.save();
       return { success: true, message: "Player added to room", room };
     } catch (error) {
@@ -101,6 +100,19 @@ class RoomsController {
       throw new Error(
         "An error occurred while removing the player: " + error.message
       );
+    }
+  }
+
+  static async deleteRoom(roomCode) {
+    try {
+      const result = await Room.findOneAndDelete({ code: roomCode });
+      if (result) {
+        return { success: true, message: "Room deleted successfully" };
+      } else {
+        return { success: false, message: "Couldn't find the room" };
+      }
+    } catch (error) {
+      throw new Error("An error occurred deleting the room: " + error.message);
     }
   }
 }

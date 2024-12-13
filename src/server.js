@@ -7,7 +7,7 @@ import cors from "cors";
 import dbConnect from "./config/dbConnect.js";
 import routes from "./routes/index.js";
 import { Server } from "socket.io";
-import RoomsController from "./controllers/roomsController.js";
+import lobbyEvents from "./events/lobbyEvents.js";
 
 // Porta que será usada na aplicação
 const PORT = 3030;
@@ -50,45 +50,7 @@ app.use(
 );
 
 io.on("connection", (socket) => {
-  console.log("A user connected");
-
-  socket.on("join-lobby", async ({ roomCode, playerName }) => {
-    // Adiciona o jogador à sala no servidor
-    const result = await RoomsController.addPlayerToRoom(roomCode, playerName);
-
-    if (result.success) {
-      console.log(`${playerName} entrou na sala ${roomCode}`);
-      // Adiciona o socket à sala
-      socket.join(roomCode);
-      console.log("TEM QUE MANDAR");
-      // Emitir para todos os clientes da sala
-      io.to(roomCode).emit("player-joined", {
-        message: `${playerName} entrou na sala!`,
-        players: result.room.players,
-      });
-    }
-  });
-
-  socket.on("leave-lobby", async ({ roomCode, playerName }) => {
-    // Remove o jogador da sala no servidor
-    const result = await RoomsController.removePlayerFromRoom(
-      roomCode,
-      playerName
-    );
-
-    if (result.success) {
-      console.log(`${playerName} deixou a sala ${roomCode}`);
-      // Emitir para todos os clientes da sala
-      io.to(roomCode).emit("player-left", {
-        message: `${playerName} deixou a sala.`,
-        players: result.room.players,
-      });
-    }
-  });
-
-  socket.on("chat-message-sent", ({ roomCode, message }) => {
-    io.to(roomCode).emit("chat-message-received", message);
-  });
+  lobbyEvents(socket, io);
 });
 
 // Ouve as conexões
