@@ -7,9 +7,9 @@ const roomSchema = new mongoose.Schema(
     players: [
       {
         name: { type: String, required: true },
+        avatar: { type: String, required: true },
       },
     ],
-    game: { type: mongoose.ObjectId },
   },
   { versionKey: false }
 );

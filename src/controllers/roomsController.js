@@ -27,6 +27,7 @@ class RoomsController {
       const roomJson = {
         code: roomCode,
         host: hostName,
+        players: [{ name: hostName, avatar: req.body.avatar }],
       };
       const createdRoom = await Room.create(roomJson);
       res
