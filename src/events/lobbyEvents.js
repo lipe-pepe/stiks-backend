@@ -14,6 +14,8 @@ function lobbyEvents(socket, io) {
     // Adiciona o jogador à sala no servidor
     const result = await addPlayerToRoom(roomCode, playerName);
 
+    console.log(result);
+
     if (result.success) {
       console.log(`${playerName} entrou na sala ${roomCode}`);
       // Adiciona o socket à sala

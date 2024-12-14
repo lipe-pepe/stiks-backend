@@ -1,4 +1,5 @@
 import { Room } from "../models/index.js";
+import HttpStatus from "../utils/httpStatus.js";
 
 // -------------------------------------------------------------------------
 
@@ -7,7 +8,10 @@ async function addPlayerToRoom(roomCode, playerName) {
     // Verifica se a sala existe
     const room = await Room.findOne({ code: roomCode });
     if (!room) {
-      return { success: false, message: "Room not found" };
+      return {
+        status: HttpStatus.NOT_FOUND,
+        message: "Room not found",
+      };
     }
 
     // Verifica se o jogador já está na sala
@@ -15,13 +19,20 @@ async function addPlayerToRoom(roomCode, playerName) {
       (player) => player.name === playerName
     );
     if (playerExists) {
-      return { success: false, message: "Player already in the room" };
+      return {
+        status: HttpStatus.CONFLICT,
+        message: "Player already in the room",
+      };
     }
 
     // Adiciona o jogador à sala
     room.players.push({ name: playerName });
     await room.save();
-    return { success: true, message: "Player added to room", room };
+    return {
+      status: HttpStatus.OK,
+      message: "Player added to room",
+      room,
+    };
   } catch (error) {
     throw new Error(
       "An error occurred while adding the player: " + error.message

@@ -14,7 +14,7 @@ class GamesController {
           return { name: player.name, sticks: 3 };
         });
         const gameJson = {
-          room: roomCode,
+          roomCode: roomCode,
           players: gamePlayers,
           turnPlayer: gamePlayers[0].name,
         };

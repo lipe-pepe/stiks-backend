@@ -8,5 +8,6 @@ const routes = express.Router();
 
 routes.get("/rooms/:code", RoomsController.getRoom);
 routes.post("/rooms", RoomsController.createRoom);
+routes.put("/rooms/:code/add", RoomsController.addPlayer);
 
 export default routes;

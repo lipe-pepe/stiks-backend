@@ -1,4 +1,7 @@
+import { addPlayerToRoom } from "../db/rooms.js";
 import { Room } from "../models/index.js";
+
+import HttpStatus from "../utils/httpStatus.js";
 
 class RoomsController {
   static async getRoom(req, res, next) {
@@ -6,9 +9,11 @@ class RoomsController {
       const code = req.params.code;
       const roomResult = await Room.findOne({ code: code });
       if (roomResult !== null) {
-        res.status(200).json({ message: "Room found", room: roomResult });
+        res
+          .status(HttpStatus.OK)
+          .json({ message: "Room found", room: roomResult });
       } else {
-        res.status(404).json({ message: "Room not found" });
+        res.status(HttpStatus.NOT_FOUND).json({ message: "Room not found" });
       }
     } catch (error) {
       next(error);
@@ -24,7 +29,25 @@ class RoomsController {
         host: hostName,
       };
       const createdRoom = await Room.create(roomJson);
-      res.status(201).json({ message: "Room created", room: createdRoom });
+      res
+        .status(HttpStatus.CREATED)
+        .json({ message: "Room created", room: createdRoom });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async addPlayer(req, res, next) {
+    try {
+      const roomCode = req.params.code;
+      const result = await addPlayerToRoom(roomCode, req.body.name);
+      if (result.status === HttpStatus.CONFLICT) {
+        res
+          .status(HttpStatus.CONFLICT)
+          .json({ message: "Já tem um jogador na sala com esse nome!" });
+      } else {
+        res.status(result.status).json({ message: result.message });
+      }
     } catch (error) {
       next(error);
     }
@@ -35,9 +58,9 @@ class RoomsController {
       const roomCode = req.body.code;
       const roomResult = await Room.findOneAndDelete({ code: roomCode });
       if (roomResult !== null) {
-        res.status(200).send({ message: "Room was deleted" });
+        res.status(HttpStatus.OK).send({ message: "Room was deleted" });
       } else {
-        res.status(404).send({ message: "Room wasn't found" });
+        res.status(HttpStatus.NOT_FOUND).send({ message: "Room wasn't found" });
       }
     } catch (error) {
       next(error);
