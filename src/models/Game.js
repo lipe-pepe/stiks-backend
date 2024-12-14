@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 
 const gameSchema = new mongoose.Schema(
   {
-    room: { type: mongoose.ObjectId },
+    roomCode: { type: String, required: true },
     state: {
       type: String,
       enum: ["choosing", "guessing", "revealing"], // Define os valores permitidos para o campo

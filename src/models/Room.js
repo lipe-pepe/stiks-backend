@@ -9,6 +9,7 @@ const roomSchema = new mongoose.Schema(
         name: { type: String, required: true },
       },
     ],
+    game: { type: mongoose.ObjectId },
   },
   { versionKey: false }
 );
