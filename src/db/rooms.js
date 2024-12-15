@@ -3,8 +3,9 @@ import HttpStatus from "../utils/httpStatus.js";
 
 // -------------------------------------------------------------------------
 
-async function addPlayerToRoom(roomCode, playerName) {
+async function addPlayerToRoom(roomCode, { name, avatar }) {
   try {
+    console.log(name, avatar);
     // Verifica se a sala existe
     const room = await Room.findOne({ code: roomCode });
     if (!room) {
@@ -15,9 +16,7 @@ async function addPlayerToRoom(roomCode, playerName) {
     }
 
     // Verifica se o jogador já está na sala
-    const playerExists = room.players.some(
-      (player) => player.name === playerName
-    );
+    const playerExists = room.players.some((player) => player.name === name);
     if (playerExists) {
       return {
         status: HttpStatus.CONFLICT,
@@ -26,7 +25,7 @@ async function addPlayerToRoom(roomCode, playerName) {
     }
 
     // Adiciona o jogador à sala
-    room.players.push({ name: playerName });
+    room.players.push({ name, avatar });
     await room.save();
     return {
       status: HttpStatus.OK,

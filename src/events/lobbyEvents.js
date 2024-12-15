@@ -11,21 +11,15 @@ function lobbyEvents(socket, io) {
   // -------------------------------------------------------------------------------
 
   socket.on("join-lobby", async ({ roomCode, playerName }) => {
-    // Adiciona o jogador à sala no servidor
-    const result = await addPlayerToRoom(roomCode, playerName);
+    console.log(`${playerName} entrou na sala ${roomCode}`);
+    // Emitir para todos os clientes da sala
+    io.to(roomCode).emit("player-joined", {
+      message: `${playerName} entrou na sala!`,
+      player: playerName,
+    });
 
-    console.log(result);
-
-    if (result.success) {
-      console.log(`${playerName} entrou na sala ${roomCode}`);
-      // Adiciona o socket à sala
-      socket.join(roomCode);
-      // Emitir para todos os clientes da sala
-      io.to(roomCode).emit("player-joined", {
-        message: `${playerName} entrou na sala!`,
-        players: result.room.players,
-      });
-    }
+    // Adiciona o socket à sala
+    socket.join(roomCode);
   });
 
   // -------------------------------------------------------------------------------

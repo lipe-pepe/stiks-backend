@@ -41,7 +41,7 @@ class RoomsController {
   static async addPlayer(req, res, next) {
     try {
       const roomCode = req.params.code;
-      const result = await addPlayerToRoom(roomCode, req.body.name);
+      const result = await addPlayerToRoom(roomCode, req.body);
       if (result.status === HttpStatus.CONFLICT) {
         res
           .status(HttpStatus.CONFLICT)
