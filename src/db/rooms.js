@@ -1,13 +1,14 @@
 import { Room } from "../models/index.js";
 import HttpStatus from "../utils/httpStatus.js";
+import { createPlayer } from "./players.js";
 
 // -------------------------------------------------------------------------
 
-async function addPlayerToRoom(roomCode, { name, avatar }) {
+async function addPlayerToRoom(roomCode, { name, avatar, stik, role }) {
   try {
-    console.log(name, avatar);
+    console.log("Entra aqui");
     // Verifica se a sala existe
-    const room = await Room.findOne({ code: roomCode });
+    const room = await Room.findOne({ code: roomCode }).populate("players");
     if (!room) {
       return {
         status: HttpStatus.NOT_FOUND,
@@ -25,14 +26,19 @@ async function addPlayerToRoom(roomCode, { name, avatar }) {
       };
     }
 
-    // Adiciona o jogador à sala
-    room.players.push({ name, avatar });
-    await room.save();
-    return {
-      status: HttpStatus.OK,
-      message: "Player added to room",
-      room,
-    };
+    // Cria o player
+    const result = await createPlayer({ name, avatar, stik, role, room: room });
+
+    if (result.player != null) {
+      // Adiciona o jogador à sala
+      room.players.push(result.player);
+      await room.save();
+      return {
+        status: HttpStatus.OK,
+        message: "Player added to room",
+        room,
+      };
+    }
   } catch (error) {
     throw new Error(
       "An error occurred while adding the player: " + error.message

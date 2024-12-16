@@ -9,8 +9,8 @@ const roomSchema = new mongoose.Schema(
       required: true, // Torna o campo obrigatório
       default: "lobby", // Valor padrão
     },
-    players: [{ type: mongoose.Schema.Types.ObjectId, ref: "Player" }], // Referência ao modelo Player
-    match: { type: mongoose.Schema.Types.ObjectId, ref: "Match" }, // Referência ao modelo Match
+    players: [{ type: mongoose.Schema.Types.ObjectId, ref: "players" }], // Referência ao modelo Player
+    match: { type: mongoose.Schema.Types.ObjectId, ref: "matches" }, // Referência ao modelo Match
   },
   { versionKey: false }
 );
