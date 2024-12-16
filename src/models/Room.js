@@ -5,7 +5,7 @@ const roomSchema = new mongoose.Schema(
     code: { type: String, required: [true, "The room code is required"] },
     status: {
       type: String,
-      enum: ["lobby", "in_match"], // Valores permitidos
+      enum: ["in_lobby", "in_game"], // Valores permitidos
       required: true, // Torna o campo obrigatório
       default: "lobby", // Valor padrão
     },

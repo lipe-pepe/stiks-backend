@@ -1,3 +1,4 @@
+import { createPlayer } from "../db/players.js";
 import { addPlayerToRoom } from "../db/rooms.js";
 import { Room } from "../models/index.js";
 
@@ -22,17 +23,23 @@ class RoomsController {
   static async createRoom(req, res, next) {
     try {
       const roomCode = generateRoomCode();
-
-      const hostName = req.body.hostName;
-      const roomJson = {
-        code: roomCode,
-        host: hostName,
-        players: [{ name: hostName, avatar: req.body.avatar }],
-      };
-      const createdRoom = await Room.create(roomJson);
-      res
-        .status(HttpStatus.CREATED)
-        .json({ message: "Room created", room: createdRoom });
+      const playerJson = req.body;
+      const result = await createPlayer(playerJson);
+      if (result.player != null) {
+        const roomJson = {
+          code: roomCode,
+          status: "in_lobby",
+          players: [result.player],
+        };
+        const createdRoom = await Room.create(roomJson);
+        res
+          .status(HttpStatus.CREATED)
+          .json({ message: "Room created", room: createdRoom });
+      } else {
+        res
+          .status(HttpStatus.INTERNAL_SERVER_ERROR)
+          .json({ message: "Internal server error" });
+      }
     } catch (error) {
       next(error);
     }
