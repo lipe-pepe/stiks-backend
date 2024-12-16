@@ -3,6 +3,7 @@ import {
   deleteRoom,
   removePlayerFromRoom,
 } from "../db/rooms.js";
+import Room from "../models/Room.js";
 import HttpStatus from "../utils/httpStatus.js";
 
 // Esse arquivo registra todos os eventos relacionados ao lobby. Ele é depois usado no server para
@@ -11,17 +12,12 @@ import HttpStatus from "../utils/httpStatus.js";
 function lobbyEvents(socket, io) {
   // -------------------------------------------------------------------------------
 
-  socket.on("join-lobby", async ({ roomCode, playerName, playerAvatar }) => {
-    console.log(`${playerName} entrou na sala ${roomCode}`);
-    // Emitir para todos os clientes da sala
-    io.to(roomCode).emit("player-joined", {
-      message: `${playerName} entrou na sala!`,
-      player: playerName,
-      avatar: playerAvatar,
-    });
+  socket.on("player-joined", async ({ roomCode }) => {
+    socket.join(roomCode); // Adiciona o socket à sala
 
-    // Adiciona o socket à sala
-    socket.join(roomCode);
+    const room = await Room.findOne({ code: roomCode }).populate("players");
+    // Emitir para todos os clientes da sala
+    io.to(roomCode).emit("player-joined", room);
   });
 
   // -------------------------------------------------------------------------------

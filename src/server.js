@@ -50,7 +50,13 @@ app.use(
 );
 
 io.on("connection", (socket) => {
+  console.log("Novo cliente conectado:", socket.id);
+
   lobbyEvents(socket, io);
+
+  socket.on("disconnect", () => {
+    console.log("Cliente desconectado:", socket.id);
+  });
 });
 
 // Ouve as conexões

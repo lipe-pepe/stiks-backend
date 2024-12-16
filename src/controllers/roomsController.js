@@ -8,7 +8,7 @@ class RoomsController {
   static async getRoom(req, res, next) {
     try {
       const code = req.params.code;
-      const roomResult = await Room.findOne({ code: code });
+      const roomResult = await Room.findOne({ code: code }).populate("players");
       if (roomResult !== null) {
         res
           .status(HttpStatus.OK)

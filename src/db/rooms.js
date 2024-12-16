@@ -6,7 +6,6 @@ import { createPlayer } from "./players.js";
 
 async function addPlayerToRoom(roomCode, { name, avatar, stik, role }) {
   try {
-    console.log("Entra aqui");
     // Verifica se a sala existe
     const room = await Room.findOne({ code: roomCode }).populate("players");
     if (!room) {
