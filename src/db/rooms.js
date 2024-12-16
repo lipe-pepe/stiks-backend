@@ -21,6 +21,7 @@ async function addPlayerToRoom(roomCode, { name, avatar }) {
       return {
         status: HttpStatus.CONFLICT,
         message: "Player already in the room",
+        room,
       };
     }
 
@@ -46,7 +47,10 @@ async function removePlayerFromRoom(roomCode, playerName) {
     // Verifica se a sala existe
     const room = await Room.findOne({ code: roomCode });
     if (!room) {
-      return { success: false, message: "Room not found" };
+      return {
+        status: HttpStatus.NOT_FOUND,
+        message: "Room not found",
+      };
     }
 
     // Verifica se o jogador já está na sala
@@ -54,7 +58,11 @@ async function removePlayerFromRoom(roomCode, playerName) {
       (player) => player.name === playerName
     );
     if (!playerExists) {
-      return { success: false, message: "Player isn't in the room" };
+      return {
+        status: HttpStatus.NOT_FOUND,
+        message: "Player isn't in the room",
+        room,
+      };
     }
 
     // Remove o jogador da sala
@@ -63,7 +71,7 @@ async function removePlayerFromRoom(roomCode, playerName) {
     );
     room.players = newPlayersArray;
     await room.save();
-    return { success: true, message: "Player removed from room", room };
+    return { status: HttpStatus.OK, message: "Player removed from room", room };
   } catch (error) {
     throw new Error(
       "An error occurred while removing the player: " + error.message
