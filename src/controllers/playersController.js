@@ -22,7 +22,7 @@ class PlayersController {
       }
 
       room.players.push(player); // Adiciona o jogador à sala
-      await room.save;
+      await room.save();
       res
         .status(HttpStatus.CREATED)
         .json({ message: "Player created", player });
