@@ -1,5 +1,3 @@
-import { createPlayer } from "../db/players.js";
-import { addPlayerToRoom } from "../db/rooms.js";
 import { Room } from "../models/index.js";
 
 import HttpStatus from "../utils/httpStatus.js";
@@ -22,40 +20,16 @@ class RoomsController {
   }
   static async createRoom(req, res, next) {
     try {
-      const roomCode = generateRoomCode();
-      const playerJson = req.body;
-      const result = await createPlayer(playerJson);
-      if (result.player != null) {
-        const roomJson = {
-          code: roomCode,
-          status: "in_lobby",
-          players: [result.player],
-        };
-        const createdRoom = await Room.create(roomJson);
+      const roomJson = {
+        code: generateRoomCode(),
+      };
+      const createdRoom = await Room.create(roomJson);
+      if (createdRoom != null) {
         res
           .status(HttpStatus.CREATED)
           .json({ message: "Room created", room: createdRoom });
       } else {
-        res
-          .status(HttpStatus.INTERNAL_SERVER_ERROR)
-          .json({ message: "Internal server error" });
-      }
-    } catch (error) {
-      next(error);
-    }
-  }
-
-  static async addPlayer(req, res, next) {
-    try {
-      const roomCode = req.params.code;
-      const player = req.body;
-      const result = await addPlayerToRoom(roomCode, player);
-      if (result.status === HttpStatus.CONFLICT) {
-        res
-          .status(HttpStatus.CONFLICT)
-          .json({ message: "Já tem um jogador na sala com esse nome!" });
-      } else {
-        res.status(result.status).json({ message: result.message });
+        res.status(HttpStatus.BAD_REQUEST).json({ message: "Bad request" });
       }
     } catch (error) {
       next(error);

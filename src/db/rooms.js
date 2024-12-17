@@ -1,10 +1,8 @@
 import { Room } from "../models/index.js";
 import HttpStatus from "../utils/httpStatus.js";
-import { createPlayer } from "./players.js";
+import { deletePlayer } from "./players.js";
 
-// -------------------------------------------------------------------------
-
-async function addPlayerToRoom(roomCode, { name, avatar, stik, role }) {
+async function removePlayerFromRoom(roomCode, playerName) {
   try {
     // Verifica se a sala existe
     const room = await Room.findOne({ code: roomCode }).populate("players");
@@ -14,55 +12,10 @@ async function addPlayerToRoom(roomCode, { name, avatar, stik, role }) {
         message: "Room not found",
       };
     }
-
     // Verifica se o jogador já está na sala
-    const playerExists = room.players.some((player) => player.name === name);
-    if (playerExists) {
-      return {
-        status: HttpStatus.CONFLICT,
-        message: "Player already in the room",
-        room,
-      };
-    }
-
-    // Cria o player
-    const result = await createPlayer({ name, avatar, stik, role, room: room });
-
-    if (result.player != null) {
-      // Adiciona o jogador à sala
-      room.players.push(result.player);
-      await room.save();
-      return {
-        status: HttpStatus.OK,
-        message: "Player added to room",
-        room,
-      };
-    }
-  } catch (error) {
-    throw new Error(
-      "An error occurred while adding the player: " + error.message
-    );
-  }
-}
-
-// -------------------------------------------------------------------------
-
-async function removePlayerFromRoom(roomCode, playerName) {
-  try {
-    // Verifica se a sala existe
-    const room = await Room.findOne({ code: roomCode });
-    if (!room) {
-      return {
-        status: HttpStatus.NOT_FOUND,
-        message: "Room not found",
-      };
-    }
-
-    // Verifica se o jogador já está na sala
-    const playerExists = room.players.some(
-      (player) => player.name === playerName
-    );
-    if (!playerExists) {
+    const player = room.players.find((player) => player.name === playerName);
+    const playerId = player !== null ? player._id : null;
+    if (playerId == null) {
       return {
         status: HttpStatus.NOT_FOUND,
         message: "Player isn't in the room",
@@ -76,6 +29,15 @@ async function removePlayerFromRoom(roomCode, playerName) {
     );
     room.players = newPlayersArray;
     await room.save();
+
+    // Apaga o jogador
+    const result = await deletePlayer();
+    if (result.NOT_FOUND) {
+      return {
+        status: HttpStatus.NOT_FOUND,
+        message: "Player wasn't found",
+      };
+    }
     return { status: HttpStatus.OK, message: "Player removed from room", room };
   } catch (error) {
     throw new Error(
@@ -101,4 +63,4 @@ async function deleteRoom(roomCode) {
 
 // -------------------------------------------------------------------------
 
-export { addPlayerToRoom, removePlayerFromRoom, deleteRoom };
+export { removePlayerFromRoom, deleteRoom };

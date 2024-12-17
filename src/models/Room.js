@@ -7,7 +7,7 @@ const roomSchema = new mongoose.Schema(
       type: String,
       enum: ["in_lobby", "in_game"], // Valores permitidos
       required: true, // Torna o campo obrigatório
-      default: "lobby", // Valor padrão
+      default: "in_lobby", // Valor padrão
     },
     players: [{ type: mongoose.Schema.Types.ObjectId, ref: "players" }], // Referência ao modelo Player
     match: { type: mongoose.Schema.Types.ObjectId, ref: "matches" }, // Referência ao modelo Match
