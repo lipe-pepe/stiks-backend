@@ -8,6 +8,7 @@ import dbConnect from "./config/dbConnect.js";
 import routes from "./routes/index.js";
 import { Server } from "socket.io";
 import lobbyEvents from "./events/lobbyEvents.js";
+import matchEvents from "./events/matchEvents.js";
 
 // Porta que será usada na aplicação
 const PORT = 3030;
@@ -53,6 +54,7 @@ io.on("connection", (socket) => {
   console.log("Novo cliente conectado:", socket.id);
 
   lobbyEvents(socket, io);
+  matchEvents(socket, io);
 
   socket.on("disconnect", () => {
     console.log("Cliente desconectado:", socket.id);

@@ -32,8 +32,11 @@ function lobbyEvents(socket, io) {
 
   // ---------------------------------------------------  ----------------------------
 
-  socket.on("host-started-game", ({ roomCode }) => {
-    io.to(roomCode).emit("host-started-game");
+  socket.on("host-started-game", async ({ roomCode }) => {
+    const room = await Room.findOne({ code: roomCode })
+      .populate("players")
+      .populate("matches");
+    io.to(roomCode).emit("host-started-game", room);
   });
 }
 

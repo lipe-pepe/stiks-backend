@@ -10,6 +10,9 @@ const matchSchema = new mongoose.Schema(
       default: "choosing", // Valor padrão
     },
     room: { type: mongoose.Schema.Types.ObjectId, ref: "Room" }, // Relacionamento reverso
+    config: {
+      playerSticks: { type: Number, default: 3 }, // O número de palitos que cada player começa o jogo
+    },
   },
   { versionKey: false }
 );

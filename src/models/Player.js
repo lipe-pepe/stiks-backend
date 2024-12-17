@@ -12,6 +12,11 @@ const playerSchema = new mongoose.Schema(
     avatar: { type: String, required: true }, // Avatar selecionado pelo player
     stik: { type: String }, // Palitinho selecionado pelo player
     room: { type: mongoose.Schema.Types.ObjectId, ref: "Room" }, // Relacionamento reverso
+    gameData: {
+      total: { type: Number, default: 3 },
+      chosen: { type: Number },
+      guess: { type: Number },
+    },
   },
   { versionKey: false }
 );

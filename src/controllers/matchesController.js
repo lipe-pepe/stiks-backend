@@ -6,7 +6,7 @@ class MatchesController {
   static async createMatch(req, res, next) {
     try {
       const roomCode = req.body.roomCode;
-      const room = await Room.findOne({ code: roomCode });
+      const room = await Room.findOne({ code: roomCode }).populate("players");
       if (room == null) {
         res
           .status(HttpStatus.NOT_FOUND)
@@ -19,6 +19,9 @@ class MatchesController {
       }
 
       room.match = match; // Adiciona a partida à sala
+      room.players.forEach((player) => {
+        player.gameData.total = match.config.playerSticks;
+      });
       await room.save();
       res.status(HttpStatus.CREATED).json({ message: "Match created", match });
     } catch (error) {
