@@ -30,10 +30,9 @@ function lobbyEvents(socket, io) {
     io.to(roomCode).emit("chat-message-received", message);
   });
 
-  // -------------------------------------------------------------------------------
+  // ---------------------------------------------------  ----------------------------
 
-  socket.on("start-game", ({ roomCode }) => {
-    // Emitir para todos os clientes da sala
+  socket.on("host-started-game", ({ roomCode }) => {
     io.to(roomCode).emit("host-started-game");
   });
 }

@@ -2,10 +2,10 @@ import mongoose from "mongoose";
 
 const matchSchema = new mongoose.Schema(
   {
-    round: { type: Number },
+    round: { type: Number, default: 1 },
     status: {
       type: String,
-      enum: ["choosing", "guessing", "revealing"], // Valores permitidos
+      enum: ["choosing", "guessing", "revealing", "results"], // Valores permitidos
       required: true, // Torna o campo obrigatório
       default: "choosing", // Valor padrão
     },
