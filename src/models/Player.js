@@ -5,7 +5,7 @@ const playerSchema = new mongoose.Schema(
     name: { type: String, required: true }, // Nome escolhido pelo player
     role: {
       type: String,
-      enum: ["host", "player", "spectator"], // Valores permitidos
+      enum: ["host", "player"], // Valores permitidos
       required: true, // Torna o campo obrigatório
       default: "player", // Valor padrão
     },

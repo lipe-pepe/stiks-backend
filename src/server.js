@@ -8,7 +8,7 @@ import dbConnect from "./config/dbConnect.js";
 import routes from "./routes/index.js";
 import { Server } from "socket.io";
 import lobbyEvents from "./events/lobbyEvents.js";
-import matchEvents from "./events/matchEvents.js";
+import gameEvents from "./events/gameEvents.js";
 
 // Porta que será usada na aplicação
 const PORT = 3030;
@@ -21,7 +21,7 @@ const connection = await dbConnect();
 // * responsável por interfacear o MongoDB com a aplicação.
 
 // Se receber um evento error na conexão, imprimimos no console
-connection.on("error", (erro) => {
+connection.on("error", (error) => {
   console.error("DB connection error: ", error);
 });
 
@@ -54,10 +54,19 @@ io.on("connection", (socket) => {
   console.log("Novo cliente conectado:", socket.id);
 
   lobbyEvents(socket, io);
-  matchEvents(socket, io);
+  gameEvents(socket, io);
 
   socket.on("disconnect", () => {
     console.log("Cliente desconectado:", socket.id);
+
+    socket.rooms.forEach(async (room) => {
+      if (room !== socket.id) {
+        // Exclui a sala padrão que é o próprio socket.id
+        const room = await Room.findOne({ code: roomCode }).populate("players");
+        // Emitir para todos os clientes da sala
+        io.to(roomCode).emit("player-left", room);
+      }
+    });
   });
 });
 

@@ -26,16 +26,14 @@ function lobbyEvents(socket, io) {
 
   // -------------------------------------------------------------------------------
 
-  socket.on("chat-message-sent", ({ roomCode, message }) => {
-    io.to(roomCode).emit("chat-message-received", message);
+  socket.on("chat-message-sent", ({ roomCode, player, message }) => {
+    io.to(roomCode).emit("chat-message-received", { player, message });
   });
 
   // ---------------------------------------------------  ----------------------------
 
   socket.on("host-started-game", async ({ roomCode }) => {
-    const room = await Room.findOne({ code: roomCode })
-      .populate("players")
-      .populate("matches");
+    const room = await Room.findOne({ code: roomCode }).populate("players");
     io.to(roomCode).emit("host-started-game", room);
   });
 }

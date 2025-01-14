@@ -22,4 +22,22 @@ async function createPlayer({ name, avatar, stik, role }) {
   }
 }
 
+// async function deletePlayer({playerId}) {
+//     try {
+//       const playerId = req.params.id;
+//       const deletedPlayer = await Player.findByIdAndDelete(playerId);
+//       if (!deletedPlayer) {
+//         res.status(HttpStatus.NOT_FOUND).json({ message: "Player not found" });
+//       }
+//       // Atualizar todas as salas, removendo o ID do jogador do array `players`
+//       const updateResult = await Room.updateMany(
+//         { players: playerId }, // Encontra salas que tem o jogador
+//         { $pull: { players: playerId } } // Remove o ID do jogador do array
+//       );
+//       res.status(HttpStatus.OK).json({ message: "Player was deleted" });
+//     } catch (error) {
+//       next(error);
+//     }
+//   }
+
 export { createPlayer };

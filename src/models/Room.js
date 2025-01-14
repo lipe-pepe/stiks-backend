@@ -3,14 +3,14 @@ import mongoose from "mongoose";
 const roomSchema = new mongoose.Schema(
   {
     code: { type: String, required: [true, "The room code is required"] },
+    players: [{ type: mongoose.Schema.Types.ObjectId, ref: "players" }], // Referência ao modelo Player
+    round: { type: Number, default: 1 },
     status: {
       type: String,
-      enum: ["in_lobby", "in_game"], // Valores permitidos
+      enum: ["choosing", "guessing", "revealing", "results"], // Valores permitidos
       required: true, // Torna o campo obrigatório
-      default: "in_lobby", // Valor padrão
+      default: "choosing", // Valor padrão
     },
-    players: [{ type: mongoose.Schema.Types.ObjectId, ref: "players" }], // Referência ao modelo Player
-    match: { type: mongoose.Schema.Types.ObjectId, ref: "matches" }, // Referência ao modelo Match
   },
   { versionKey: false }
 );
