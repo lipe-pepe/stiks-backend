@@ -11,6 +11,7 @@ const roomSchema = new mongoose.Schema(
       required: true, // Torna o campo obrigatório
       default: "choosing", // Valor padrão
     },
+    first_turn: { type: mongoose.Schema.Types.ObjectId, ref: "player" }, // Jogador que será o primeiro a jogar
   },
   { versionKey: false }
 );

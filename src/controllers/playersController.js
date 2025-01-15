@@ -22,6 +22,9 @@ class PlayersController {
       }
 
       room.players.push(player); // Adiciona o jogador à sala
+      if (room.first_turn == null) {
+        room.first_turn = player;
+      }
       await room.save();
       res
         .status(HttpStatus.CREATED)
