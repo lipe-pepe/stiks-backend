@@ -22,6 +22,12 @@ function gameEvents(socket, io) {
   socket.on("player-revealed", async ({ roomCode, playerId }) => {
     io.to(roomCode).emit("player-revealed", { playerId });
   });
+
+  // ---------------------------------------------------------------------------------
+
+  socket.on("next-round", async ({ roomCode, winnerId }) => {
+    io.to(roomCode).emit("next-round", { winnerId });
+  });
 }
 
 export default gameEvents;
