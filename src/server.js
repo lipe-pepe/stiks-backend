@@ -9,6 +9,7 @@ import routes from "./routes/index.js";
 import { Server } from "socket.io";
 import lobbyEvents from "./events/lobbyEvents.js";
 import gameEvents from "./events/gameEvents.js";
+import Room from "./models/Room.js";
 
 // Porta que será usada na aplicação
 const PORT = 3030;
@@ -56,17 +57,22 @@ io.on("connection", (socket) => {
   lobbyEvents(socket, io);
   gameEvents(socket, io);
 
-  socket.on("disconnect", () => {
-    console.log("Cliente desconectado:", socket.id);
-
+  socket.on("disconnecting", () => {
+    // Captura as salas antes de o socket ser removido
     socket.rooms.forEach(async (room) => {
+      // Exclui a sala padrão que é o próprio socket.id
       if (room !== socket.id) {
-        // Exclui a sala padrão que é o próprio socket.id
-        const room = await Room.findOne({ code: roomCode }).populate("players");
+        const foundRoom = await Room.findOne({ code: room }).populate(
+          "players"
+        );
         // Emitir para todos os clientes da sala
-        io.to(roomCode).emit("player-left", room);
+        io.to(room).emit("player-left", foundRoom);
       }
     });
+  });
+
+  socket.on("disconnect", () => {
+    console.log("Cliente desconectado:", socket.id);
   });
 });
 
