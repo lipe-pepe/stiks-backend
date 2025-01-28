@@ -3,6 +3,20 @@ import Room from "../models/Room.js";
 import Match from "../models/Match.js";
 
 class MatchesController {
+  static async getMatch(req, res, next) {
+    try {
+      const id = req.params.id;
+      const match = await Match.findById(id).populate("playersData.player");
+      if (match == null) {
+        res.status(HttpStatus.NOT_FOUND).json({ message: "Match not found" });
+      } else {
+        res.status(HttpStatus.OK).json({ message: "Match found", match });
+      }
+    } catch (error) {
+      next(error);
+    }
+  }
+
   static async createMatch(req, res, next) {
     try {
       const roomCode = req.body.roomCode;
@@ -15,8 +29,19 @@ class MatchesController {
           .json({ message: `Couldn't find room ${roomCode}` });
       }
 
-      // Criar a partida com valores obrigatórios
-      const match = await Match.create({});
+      // Inicializar playersData com os dados dos jogadores da sala
+      const playersData = room.players.map((player) => ({
+        player: player._id,
+        total: 3,
+        chosen: null,
+        guess: null,
+        revealed: false,
+      }));
+
+      // Criar a partida com os dados obrigatórios e playersData
+      const match = await Match.create({
+        playersData, // Passar os dados inicializados dos jogadores
+      });
 
       if (!match) {
         res
