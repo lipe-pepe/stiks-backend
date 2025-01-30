@@ -5,6 +5,7 @@ const routes = express.Router();
 
 routes.get("/matches/:id", MatchesController.getMatch);
 routes.post("/matches", MatchesController.createMatch);
+routes.put("/matches/:id", MatchesController.updateMatch);
 routes.put(
   "/matches/:id/player/:playerId",
   MatchesController.updateMatchPlayerData

@@ -23,7 +23,6 @@ const matchSchema = new mongoose.Schema(
       },
     ],
     turn: { type: mongoose.Schema.Types.ObjectId }, // Id do jogador da vez atual
-    totalSticks: { type: Number, default: 0 }, // Quantidade de palitinhos revelados
   },
   { versionKey: false }
 );

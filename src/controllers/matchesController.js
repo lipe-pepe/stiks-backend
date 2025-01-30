@@ -76,6 +76,16 @@ class MatchesController {
 
   // =============================================================================================
 
+  static async updateMatch(req, res, next) {
+    try {
+      const id = req.params.id;
+      await checkAndUpdateMatchStatus(id);
+      res.status(HttpStatus.OK).json({ message: "Match updated" });
+    } catch (error) {
+      next(error);
+    }
+  }
+
   static async updateMatchPlayerData(req, res, next) {
     try {
       const id = req.params.id;

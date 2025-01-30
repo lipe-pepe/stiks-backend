@@ -1,5 +1,6 @@
 import Match from "../../models/Match.js";
 import { updateMatchStatus } from "../matches.js";
+import checkAndUpdateRoundWinner from "./checkAndUpdateRoundWinner.js";
 
 async function checkAndUpdateMatchStatus(matchId) {
   const match = await Match.findById(matchId);
@@ -33,6 +34,10 @@ async function checkAndUpdateMatchStatus(matchId) {
   if (allPlayersRevealed && match.status === "revealing") {
     await updateMatchStatus(matchId, "results");
     return;
+  }
+
+  if (match.status === "results") {
+    await checkAndUpdateRoundWinner(matchId);
   }
 }
 
