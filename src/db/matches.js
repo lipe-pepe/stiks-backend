@@ -47,6 +47,16 @@ async function checkAndUpdateMatchStatus(matchId) {
 
   if (allPlayersChosen && match.status === "choosing") {
     await updateMatchStatus(matchId, "guessing");
+    return;
+  }
+
+  const allPlayersGuessed = match.playersData.every(
+    (player) => player.guess !== null
+  );
+
+  if (allPlayersGuessed && match.status === "guessing") {
+    await updateMatchStatus(matchId, "revealing");
+    return;
   }
 }
 

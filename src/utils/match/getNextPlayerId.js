@@ -1,7 +1,7 @@
 function getNextPlayerId(playersData, currentPlayerId) {
-  const currentIndex = playersData.findIndex(
-    (player) => player.player._id.toString() === currentPlayerId
-  );
+  const currentIndex = playersData.findIndex((p) => {
+    return p.player._id.toString() === currentPlayerId.toString();
+  });
 
   if (currentIndex === -1) return null; // Se não encontrou o player atual
 
