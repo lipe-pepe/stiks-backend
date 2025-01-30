@@ -8,7 +8,7 @@ import dbConnect from "./config/dbConnect.js";
 import routes from "./routes/index.js";
 import { Server } from "socket.io";
 import lobbyEvents from "./events/lobbyEvents.js";
-import gameEvents from "./events/gameEvents.js";
+import matchEvents from "./events/matchEvents.js";
 import Room from "./models/Room.js";
 
 // Porta que será usada na aplicação
@@ -55,7 +55,7 @@ io.on("connection", (socket) => {
   console.log("Novo cliente conectado:", socket.id);
 
   lobbyEvents(socket, io);
-  gameEvents(socket, io);
+  matchEvents(socket, io);
 
   socket.on("disconnecting", () => {
     // Captura as salas antes de o socket ser removido

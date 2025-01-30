@@ -1,3 +1,5 @@
+import { getMatch } from "../db/matches.js";
+
 function gameEvents(socket, io) {
   // -------------------------------------------------------------------------------
 
@@ -27,6 +29,14 @@ function gameEvents(socket, io) {
 
   socket.on("next-round", async ({ roomCode, winnerId }) => {
     io.to(roomCode).emit("next-round", { winnerId });
+  });
+
+  // ----------------------------------------------------------------------------------
+
+  socket.on("match-update", async ({ roomCode, matchId }) => {
+    const match = await getMatch(matchId);
+    // Emitir para todos os clientes da sala
+    io.to(roomCode).emit("match-update", match);
   });
 }
 

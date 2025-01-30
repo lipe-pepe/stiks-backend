@@ -29,7 +29,9 @@ class RoomsController {
           .status(HttpStatus.CREATED)
           .json({ message: "Room created", room: createdRoom });
       } else {
-        res.status(HttpStatus.BAD_REQUEST).json({ message: "Bad request" });
+        res
+          .status(HttpStatus.BAD_REQUEST)
+          .json({ message: "Bad request", error: "generic" });
       }
     } catch (error) {
       next(error);

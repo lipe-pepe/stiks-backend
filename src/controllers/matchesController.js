@@ -1,6 +1,7 @@
 import HttpStatus from "../utils/httpStatus.js";
 import Room from "../models/Room.js";
 import Match from "../models/Match.js";
+import { updateMatchPlayer } from "../db/matches.js";
 
 class MatchesController {
   static async getMatch(req, res, next) {
@@ -27,6 +28,13 @@ class MatchesController {
         return res
           .status(HttpStatus.NOT_FOUND)
           .json({ message: `Couldn't find room ${roomCode}` });
+      }
+
+      // Verificar mínimo de jogadores na sala
+      if (room.players.length < 2) {
+        return res
+          .status(HttpStatus.CONFLICT)
+          .json({ error: "minimum_players" });
       }
 
       // Inicializar playersData com os dados dos jogadores da sala
@@ -58,6 +66,37 @@ class MatchesController {
     } catch (error) {
       // Tratar erros
       next(error);
+    }
+  }
+
+  // =============================================================================================
+
+  static async updateMatchPlayerData(req, res, next) {
+    try {
+      const id = req.params.id;
+      const playerId = req.params.playerId;
+      const data = req.body.update;
+
+      // Validação: garantir que o corpo da requisição tenha campos para atualizar
+      if (!data || Object.keys(data).length === 0) {
+        return res
+          .status(HttpStatus.BAD_REQUEST)
+          .json({ message: "No fields were received to update." });
+      }
+
+      // Executa a atualização
+      const result = await updateMatchPlayer(id, playerId, data);
+
+      // Verifica se algum documento foi modificado
+      if (result.modifiedCount === 0) {
+        return res
+          .status(HttpStatus.NOT_FOUND)
+          .json({ message: "Match or Player not found", error: "not_found" });
+      } else {
+        return res.status(HttpStatus.OK).json({ message: "Updated" });
+      }
+    } catch (error) {
+      next(error); // TODO: Tratar erros assim com o next
     }
   }
 }
