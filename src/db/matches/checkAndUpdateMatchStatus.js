@@ -25,6 +25,15 @@ async function checkAndUpdateMatchStatus(matchId) {
     await updateMatchStatus(matchId, "revealing");
     return;
   }
+
+  const allPlayersRevealed = match.playersData.every(
+    (player) => player.revealed == true
+  );
+
+  if (allPlayersRevealed && match.status === "revealing") {
+    await updateMatchStatus(matchId, "results");
+    return;
+  }
 }
 
 export default checkAndUpdateMatchStatus;

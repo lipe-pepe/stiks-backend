@@ -1,11 +1,9 @@
 import HttpStatus from "../utils/httpStatus.js";
 import Room from "../models/Room.js";
 import Match from "../models/Match.js";
-import {
-  checkAndUpdateMatchStatus,
-  updateMatchPlayer,
-  updateMatchTurn,
-} from "../db/matches.js";
+import updateMatchPlayer from "../db/matches/updateMatchPlayer.js";
+import updateMatchTurn from "../db/matches/updateMatchTurn.js";
+import checkAndUpdateMatchStatus from "../db/matches/checkAndUpdateMatchStatus.js";
 
 class MatchesController {
   static async getMatch(req, res, next) {
@@ -102,8 +100,8 @@ class MatchesController {
       } else {
       }
 
-      // Se "guess" foi enviado, atualiza o turno para o próximo jogador
-      if (data.guess !== undefined) {
+      // Se "guess" ou "revealed" foi enviado, atualiza o turno para o próximo jogador
+      if (data.guess !== undefined || data.revealed !== undefined) {
         await updateMatchTurn(id);
       }
 
