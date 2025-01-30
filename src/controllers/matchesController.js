@@ -1,7 +1,11 @@
 import HttpStatus from "../utils/httpStatus.js";
 import Room from "../models/Room.js";
 import Match from "../models/Match.js";
-import { updateMatchPlayer } from "../db/matches.js";
+import {
+  checkAndUpdateMatchStatus,
+  updateMatchPlayer,
+  updateMatchTurn,
+} from "../db/matches.js";
 
 class MatchesController {
   static async getMatch(req, res, next) {
@@ -17,6 +21,8 @@ class MatchesController {
       next(error);
     }
   }
+
+  // =============================================================================================
 
   static async createMatch(req, res, next) {
     try {
@@ -49,6 +55,7 @@ class MatchesController {
       // Criar a partida com os dados obrigatórios e playersData
       const match = await Match.create({
         playersData, // Passar os dados inicializados dos jogadores
+        turn: room.players[0]._id,
       });
 
       if (!match) {
@@ -93,8 +100,17 @@ class MatchesController {
           .status(HttpStatus.NOT_FOUND)
           .json({ message: "Match or Player not found", error: "not_found" });
       } else {
-        return res.status(HttpStatus.OK).json({ message: "Updated" });
       }
+
+      // Se "guess" foi enviado, atualiza o turno para o próximo jogador
+      if (data.guess !== undefined) {
+        await updateMatchTurn(id);
+      }
+
+      // Após atualizar o jogador, verifica o status da partida
+      await checkAndUpdateMatchStatus(id);
+
+      return res.status(HttpStatus.OK).json({ message: "Updated" });
     } catch (error) {
       next(error); // TODO: Tratar erros assim com o next
     }
