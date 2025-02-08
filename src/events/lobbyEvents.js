@@ -6,22 +6,22 @@ import Room from "../models/Room.js";
 function lobbyEvents(socket, io) {
   // -------------------------------------------------------------------------------
 
-  socket.on("player-joined", async ({ roomCode }) => {
+  socket.on("player-joined", async ({ roomCode, playerId }) => {
     socket.join(roomCode); // Adiciona o socket à sala
 
     const room = await Room.findOne({ code: roomCode }).populate("players");
     // Emitir para todos os clientes da sala
-    io.to(roomCode).emit("player-joined", room);
+    io.to(roomCode).emit("player-joined", room, playerId);
   });
 
   // -------------------------------------------------------------------------------
 
-  socket.on("player-left", async ({ roomCode }) => {
+  socket.on("player-left", async ({ roomCode, playerId }) => {
     socket.leave(roomCode); // Remove o jogador da sala no socket
 
     const room = await Room.findOne({ code: roomCode }).populate("players");
     // Emitir para todos os clientes da sala
-    io.to(roomCode).emit("player-left", room);
+    io.to(roomCode).emit("player-left", room, playerId);
   });
 
   // -------------------------------------------------------------------------------
