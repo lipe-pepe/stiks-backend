@@ -20,6 +20,14 @@ function gameEvents(socket, io) {
     // Emitir para todos os clientes da sala
     io.to(roomCode).emit("match-update", match);
   });
+
+  // ----------------------------------------------------------------------------------
+
+  socket.on("player-chose", async ({ roomCode, matchId, playerId }) => {
+    const match = await getMatch(matchId);
+    // Emitir para todos os clientes da sala
+    io.to(roomCode).emit("player-chose", match, playerId);
+  });
 }
 
 export default gameEvents;
