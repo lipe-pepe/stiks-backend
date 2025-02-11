@@ -28,6 +28,18 @@ function gameEvents(socket, io) {
     // Emitir para todos os clientes da sala
     io.to(roomCode).emit("player-chose", match, playerId);
   });
+
+  socket.on("player-guessed", async ({ roomCode, matchId, playerId }) => {
+    const match = await getMatch(matchId);
+    // Emitir para todos os clientes da sala
+    io.to(roomCode).emit("player-guessed", match, playerId);
+  });
+
+  socket.on("player-revealed", async ({ roomCode, matchId, playerId }) => {
+    const match = await getMatch(matchId);
+    // Emitir para todos os clientes da sala
+    io.to(roomCode).emit("player-revealed", match, playerId);
+  });
 }
 
 export default gameEvents;
