@@ -20,6 +20,7 @@ const matchSchema = new mongoose.Schema(
         chosen: { type: Number }, // O número de palitos escolhidos na rodada
         guess: { type: Number }, // O número de palitos palpitado
         revealed: { type: Boolean, default: false },
+        position: { type: Number }, // A posição do jogador que já ganhou a partida
       },
     ],
     turn: { type: mongoose.Schema.Types.ObjectId }, // Id do jogador da vez atual
