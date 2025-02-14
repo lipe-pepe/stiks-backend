@@ -48,6 +48,7 @@ class MatchesController {
         chosen: null,
         guess: null,
         revealed: false,
+        position: null,
       }));
 
       // Criar a partida com os dados obrigatórios e playersData

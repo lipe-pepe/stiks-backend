@@ -8,25 +8,36 @@ async function checkAndUpdateRoundWinner(matchId) {
     return res.status(404).json({ message: "Match not found." });
   }
 
-  // Soma todos os valores de `chosen`, ignorando `null`
+  // 1. Encontra o vencedor da rodada
+
   const totalChosen = match.playersData.reduce(
     (sum, p) => sum + (p.chosen ?? 0),
     0
-  );
+  ); // Soma todos os valores de `chosen`, ignorando `null`
 
-  // Encontra o player que acertou o palpite
   const winnerIndex = match.playersData.findIndex(
     (p) => p.guess === totalChosen
-  );
+  ); // Encontra o player que acertou o palpite
   if (winnerIndex === -1) {
     await updateRound(matchId);
     return; // Se ninguém acertou, não faz nada
   }
 
-  // Decrementa o total do vencedor
+  // 2. Atualiza o vencedor
+
   match.playersData[winnerIndex].total--;
 
-  // Verifica quantos jogadores têm total > 0
+  // Atualiza a posição do vencedor, se necessário
+  if (match.playersData[winnerIndex].total === 0) {
+    const lastPosition = match.playersData.reduce(
+      (max, p) => (p.position !== undefined ? Math.max(max, p.position) : max),
+      0
+    );
+    match.playersData[winnerIndex].position = lastPosition + 1;
+  }
+
+  // 3. Atualiza fim da partida
+
   const playersWithPoints = match.playersData.filter((p) => p.total > 0);
 
   // Se sobrou só um player, atualiza o status para "end", senão começa uma nova rodada

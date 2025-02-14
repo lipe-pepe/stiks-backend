@@ -9,27 +9,27 @@ async function checkAndUpdateMatchStatus(matchId) {
     return res.status(404).json({ message: "Match not found." });
   }
 
-  const allPlayersChosen = match.playersData.every(
-    (player) => player.chosen !== null
-  );
+  const allPlayersChosen = match.playersData
+    .filter((player) => player.position == null)
+    .every((player) => player.chosen !== null);
 
   if (allPlayersChosen && match.status === "choosing") {
     await updateMatchStatus(matchId, "guessing");
     return;
   }
 
-  const allPlayersGuessed = match.playersData.every(
-    (player) => player.guess !== null
-  );
+  const allPlayersGuessed = match.playersData
+    .filter((player) => player.position == null)
+    .every((player) => player.guess !== null);
 
   if (allPlayersGuessed && match.status === "guessing") {
     await updateMatchStatus(matchId, "revealing");
     return;
   }
 
-  const allPlayersRevealed = match.playersData.every(
-    (player) => player.revealed == true
-  );
+  const allPlayersRevealed = match.playersData
+    .filter((player) => player.position == null)
+    .every((player) => player.revealed == true);
 
   if (allPlayersRevealed && match.status === "revealing") {
     await updateMatchStatus(matchId, "results");
