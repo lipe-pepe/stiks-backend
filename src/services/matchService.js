@@ -124,7 +124,7 @@ class MatchService {
       match.turn = getNextPlayerId(match.playersData, match.turn);
       match.status = "choosing";
 
-      return; // Se ninguém acertou, não faz nada
+      return true; // Se ninguém acertou, não faz nada
     }
 
     // 2. Atualiza o vencedor
@@ -161,6 +161,7 @@ class MatchService {
 
     // Persiste os dados no banco:
     this.#saveMatchToDatabase(match);
+    return true;
   }
 
   // ========================================================================
