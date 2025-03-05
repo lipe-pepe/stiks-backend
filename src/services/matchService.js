@@ -49,7 +49,6 @@ class MatchService {
   // ========================================================================
 
   setMatchPlayerGuess(matchId, playerId, value) {
-    console.log("ENTROU NO SETMATCHPLAUER GUESSSS");
     const match = this.matches.get(matchId);
 
     if (!match) {
@@ -70,7 +69,32 @@ class MatchService {
     match.turn = getNextPlayerId(match.playersData, match.turn);
 
     this.#checkGuessingStatus(matchId);
-    console.log("como ficou a match: ", this.matches.get(matchId));
+    return true;
+  }
+
+  // ========================================================================
+
+  setMatchPlayerRevealed(matchId, playerId) {
+    const match = this.matches.get(matchId);
+
+    if (!match) {
+      console.error(`Match ${matchId} not found in memory.`);
+      return false;
+    }
+
+    const playerData = match.playersData.find(
+      (p) => p.player._id.toString() === playerId
+    );
+
+    if (!playerData) {
+      console.error(`Player ${playerId} not found in match ${matchId}.`);
+      return false;
+    }
+
+    playerData.revealed = true;
+    match.turn = getNextPlayerId(match.playersData, match.turn);
+
+    this.#checkRevealingStatus(matchId);
     return true;
   }
 
@@ -96,7 +120,6 @@ class MatchService {
   // ========================================================================
 
   #checkGuessingStatus(matchId) {
-    console.log("ENTROU AQUI TAMBEM!!!");
     const match = this.matches.get(matchId);
 
     if (!match) {
@@ -110,6 +133,25 @@ class MatchService {
 
     if (allPlayersGuessed && match.status === "guessing") {
       match.status = "revealing";
+    }
+  }
+
+  // ========================================================================
+
+  #checkRevealingStatus(matchId) {
+    const match = this.matches.get(matchId);
+
+    if (!match) {
+      console.error(`Match ${matchId} not found in memory.`);
+      return;
+    }
+
+    const allPlayersRevealed = match.playersData
+      .filter((player) => player.position == null)
+      .every((player) => player.revealed == true);
+
+    if (allPlayersRevealed && match.status === "revealing") {
+      match.status = "results";
     }
   }
 

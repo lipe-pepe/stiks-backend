@@ -120,17 +120,14 @@ class MatchesController {
         result = MatchService.setMatchPlayerChosen(id, playerId, data.chosen);
       } else if (data.guess) {
         result = MatchService.setMatchPlayerGuess(id, playerId, data.guess);
+      } else if (data.revealed) {
+        result = MatchService.setMatchPlayerRevealed(id, playerId);
       }
       if (!result) {
         return res
           .status(HttpStatus.NOT_FOUND)
           .json({ message: "Match or Player not found", error: "not_found" });
       }
-
-      // // Se "guess" ou "revealed" foi enviado, atualiza o turno para o próximo jogador
-      // if (data.guess !== undefined || data.revealed !== undefined) {
-      //   await updateMatchTurn(id);
-      // }
 
       // // Após atualizar o jogador, verifica o status da partida
       // await checkAndUpdateMatchStatus(id);
