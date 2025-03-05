@@ -4,17 +4,31 @@ import Match from "../models/Match.js";
 import updateMatchPlayer from "../db/matches/updateMatchPlayer.js";
 import updateMatchTurn from "../db/matches/updateMatchTurn.js";
 import checkAndUpdateMatchStatus from "../db/matches/checkAndUpdateMatchStatus.js";
+import MatchService from "../services/matchService.js";
 
 class MatchesController {
   static async getMatch(req, res, next) {
     try {
       const id = req.params.id;
-      const match = await Match.findById(id).populate("playersData.player");
-      if (match == null) {
-        res.status(HttpStatus.NOT_FOUND).json({ message: "Match not found" });
-      } else {
-        res.status(HttpStatus.OK).json({ message: "Match found", match });
+
+      // Busca a partida na memória (cache)
+      let match = MatchService.getMatch(id);
+
+      if (!match) {
+        // Se a partida não estiver na memória, busca no banco e salva na memória
+        match = await Match.findById(id).populate("playersData.player");
+        if (match) {
+          MatchService.createMatch(id, match.toObject());
+        }
       }
+
+      if (!match) {
+        return res
+          .status(HttpStatus.NOT_FOUND)
+          .json({ message: "Match not found" });
+      }
+
+      return res.status(HttpStatus.OK).json({ message: "Match found", match });
     } catch (error) {
       next(error);
     }
