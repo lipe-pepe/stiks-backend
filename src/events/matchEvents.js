@@ -32,7 +32,8 @@ function gameEvents(socket, io) {
   });
 
   socket.on("player-guessed", async ({ roomCode, matchId, playerId }) => {
-    const match = await getMatch(matchId);
+    const match = MatchService.getMatch(matchId);
+
     // Emitir para todos os clientes da sala
     io.to(roomCode).emit("player-guessed", match, playerId);
   });

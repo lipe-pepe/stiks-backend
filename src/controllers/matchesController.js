@@ -1,7 +1,6 @@
 import HttpStatus from "../utils/httpStatus.js";
 import Room from "../models/Room.js";
 import Match from "../models/Match.js";
-import updateMatchTurn from "../db/matches/updateMatchTurn.js";
 import checkAndUpdateMatchStatus from "../db/matches/checkAndUpdateMatchStatus.js";
 import MatchService from "../services/matchService.js";
 
@@ -115,18 +114,17 @@ class MatchesController {
           .json({ message: "No fields were received to update." });
       }
 
+      let result = false;
       // Atualiza a partida na memória
       if (data.chosen) {
-        const result = MatchService.setMatchPlayerChosen(
-          id,
-          playerId,
-          data.chosen
-        );
-        if (!result) {
-          return res
-            .status(HttpStatus.NOT_FOUND)
-            .json({ message: "Match or Player not found", error: "not_found" });
-        }
+        result = MatchService.setMatchPlayerChosen(id, playerId, data.chosen);
+      } else if (data.guess) {
+        result = MatchService.setMatchPlayerGuess(id, playerId, data.guess);
+      }
+      if (!result) {
+        return res
+          .status(HttpStatus.NOT_FOUND)
+          .json({ message: "Match or Player not found", error: "not_found" });
       }
 
       // // Se "guess" ou "revealed" foi enviado, atualiza o turno para o próximo jogador
