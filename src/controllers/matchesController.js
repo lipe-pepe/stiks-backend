@@ -1,7 +1,6 @@
 import HttpStatus from "../utils/httpStatus.js";
 import Room from "../models/Room.js";
 import Match from "../models/Match.js";
-import updateMatchPlayer from "../db/matches/updateMatchPlayer.js";
 import updateMatchTurn from "../db/matches/updateMatchTurn.js";
 import checkAndUpdateMatchStatus from "../db/matches/checkAndUpdateMatchStatus.js";
 import MatchService from "../services/matchService.js";
@@ -101,6 +100,8 @@ class MatchesController {
     }
   }
 
+  // =============================================================================================
+
   static async updateMatchPlayerData(req, res, next) {
     try {
       const id = req.params.id;
@@ -114,24 +115,27 @@ class MatchesController {
           .json({ message: "No fields were received to update." });
       }
 
-      // Executa a atualização
-      const result = await updateMatchPlayer(id, playerId, data);
-
-      // Verifica se algum documento foi modificado
-      if (result.modifiedCount === 0) {
-        return res
-          .status(HttpStatus.NOT_FOUND)
-          .json({ message: "Match or Player not found", error: "not_found" });
-      } else {
+      // Atualiza a partida na memória
+      if (data.chosen) {
+        const result = MatchService.setMatchPlayerChosen(
+          id,
+          playerId,
+          data.chosen
+        );
+        if (!result) {
+          return res
+            .status(HttpStatus.NOT_FOUND)
+            .json({ message: "Match or Player not found", error: "not_found" });
+        }
       }
 
-      // Se "guess" ou "revealed" foi enviado, atualiza o turno para o próximo jogador
-      if (data.guess !== undefined || data.revealed !== undefined) {
-        await updateMatchTurn(id);
-      }
+      // // Se "guess" ou "revealed" foi enviado, atualiza o turno para o próximo jogador
+      // if (data.guess !== undefined || data.revealed !== undefined) {
+      //   await updateMatchTurn(id);
+      // }
 
-      // Após atualizar o jogador, verifica o status da partida
-      await checkAndUpdateMatchStatus(id);
+      // // Após atualizar o jogador, verifica o status da partida
+      // await checkAndUpdateMatchStatus(id);
 
       return res.status(HttpStatus.OK).json({ message: "Updated" });
     } catch (error) {

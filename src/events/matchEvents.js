@@ -1,4 +1,5 @@
 import { getMatch } from "../db/matches.js";
+import MatchService from "../services/matchService.js"; // Importando o serviço de cache
 
 function gameEvents(socket, io) {
   // -------------------------------------------------------------------------------
@@ -24,7 +25,8 @@ function gameEvents(socket, io) {
   // ----------------------------------------------------------------------------------
 
   socket.on("player-chose", async ({ roomCode, matchId, playerId }) => {
-    const match = await getMatch(matchId);
+    const match = MatchService.getMatch(matchId);
+
     // Emitir para todos os clientes da sala
     io.to(roomCode).emit("player-chose", match, playerId);
   });

@@ -21,6 +21,27 @@ class MatchService {
 
   deleteMatch(matchId) {}
 
+  setMatchPlayerChosen(matchId, playerId, value) {
+    const match = this.matches.get(matchId);
+
+    if (!match) {
+      console.error(`Match ${matchId} not found in memory.`);
+      return false;
+    }
+
+    const playerData = match.playersData.find(
+      (p) => p.player._id.toString() === playerId
+    );
+
+    if (!playerData) {
+      console.error(`Player ${playerId} not found in match ${matchId}.`);
+      return false;
+    }
+
+    playerData.chosen = value;
+    return true; // Indica sucesso
+  }
+
   saveMatchToDatabase(matchModel) {
     // Implementar a lógica para persistir no MongoDB
   }
