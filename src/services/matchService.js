@@ -39,7 +39,26 @@ class MatchService {
     }
 
     playerData.chosen = value;
+
+    this.#checkChoosingStatus(matchId);
     return true; // Indica sucesso
+  }
+
+  #checkChoosingStatus(matchId) {
+    const match = this.matches.get(matchId);
+
+    if (!match) {
+      console.error(`Match ${matchId} not found in memory.`);
+      return;
+    }
+
+    const allPlayersChosen = match.playersData
+      .filter((player) => player.position == null)
+      .every((player) => player.chosen !== null);
+
+    if (allPlayersChosen && match.status === "choosing") {
+      match.status = "guessing";
+    }
   }
 
   saveMatchToDatabase(matchModel) {
