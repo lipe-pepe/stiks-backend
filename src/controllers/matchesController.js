@@ -122,9 +122,9 @@ class MatchesController {
 
       let result = false;
       // Atualiza a partida na memória
-      if (data.chosen) {
+      if (data.chosen != null) {
         result = MatchService.setMatchPlayerChosen(id, playerId, data.chosen);
-      } else if (data.guess) {
+      } else if (data.guess != null) {
         result = MatchService.setMatchPlayerGuess(id, playerId, data.guess);
       } else if (data.revealed) {
         result = MatchService.setMatchPlayerRevealed(id, playerId);
