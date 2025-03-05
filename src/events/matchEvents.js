@@ -1,4 +1,3 @@
-import { getMatch } from "../db/matches.js";
 import MatchService from "../services/matchService.js"; // Importando o serviço de cache
 
 function matchEvents(socket, io) {
@@ -17,7 +16,7 @@ function matchEvents(socket, io) {
   // ----------------------------------------------------------------------------------
 
   socket.on("match-update", async ({ roomCode, matchId }) => {
-    const match = await getMatch(matchId);
+    const match = MatchService.getMatch(matchId);
     // Emitir para todos os clientes da sala
     io.to(roomCode).emit("match-update", match);
   });

@@ -1,7 +1,6 @@
 import HttpStatus from "../utils/httpStatus.js";
 import Room from "../models/Room.js";
 import Match from "../models/Match.js";
-import checkAndUpdateMatchStatus from "../db/matches/checkAndUpdateMatchStatus.js";
 import MatchService from "../services/matchService.js";
 
 class MatchesController {
@@ -92,7 +91,14 @@ class MatchesController {
   static async updateMatch(req, res, next) {
     try {
       const id = req.params.id;
-      await checkAndUpdateMatchStatus(id);
+      console.log("id recebido: ", id);
+      const result = MatchService.nextRound(id);
+      if (!result) {
+        return res
+          .status(HttpStatus.NOT_FOUND)
+          .json({ message: "Match or Player not found", error: "not_found" });
+      }
+
       res.status(HttpStatus.OK).json({ message: "Match updated" });
     } catch (error) {
       next(error);
@@ -128,9 +134,6 @@ class MatchesController {
           .status(HttpStatus.NOT_FOUND)
           .json({ message: "Match or Player not found", error: "not_found" });
       }
-
-      // // Após atualizar o jogador, verifica o status da partida
-      // await checkAndUpdateMatchStatus(id);
 
       return res.status(HttpStatus.OK).json({ message: "Updated" });
     } catch (error) {
